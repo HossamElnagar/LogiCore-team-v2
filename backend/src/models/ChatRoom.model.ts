@@ -105,10 +105,6 @@ const chatRoomSchema = new Schema<IChatRoom>(
     toJSON: {
       virtuals: true, 
       versionKey: false, 
-      transform(_doc, ret: Record<string, unknown>) {
-        ret["_id"] = undefined; 
-        return ret; 
-      },
     },
     toObject: {
       virtuals: true, 

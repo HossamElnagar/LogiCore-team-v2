@@ -32,11 +32,91 @@ export const updateShipmentStatus = createAsyncThunk(
     shipmentService.updateShipmentStatus(id, payload)
 );
 
-export const importShipments = createAsyncThunk(
-  "shipments/importShipments",
-  async (payload: { shipments: any[] }, { rejectWithValue }) => {
+export const stageCsvImport = createAsyncThunk(
+  "shipments/stageCsvImport",
+  async (csvData: string, { rejectWithValue }) => {
     try {
-      return await shipmentService.bulkImport(payload);
+      return await shipmentService.importCsv(csvData);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || { message: error.message });
+    }
+  }
+);
+export const submitBatchForApproval = createAsyncThunk(
+  "shipments/submitBatchForApproval",
+  async (batchId: string, { rejectWithValue }) => {
+    try {
+      return await shipmentService.submitBatchForApproval(batchId);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || { message: error.message });
+    }
+  }
+);
+export const listPendingBatches = createAsyncThunk(
+  "shipments/listPendingBatches",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await shipmentService.listPendingBatches();
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || { message: error.message });
+    }
+  }
+);
+export const getBatchDetailsForFinance = createAsyncThunk(
+  "shipments/getBatchDetailsForFinance",
+  async (batchId: string, { rejectWithValue }) => {
+    try {
+      return await shipmentService.getBatchDetailsForFinance(batchId);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || { message: error.message });
+    }
+  }
+);
+export const getBatchDetailsForAccountant = createAsyncThunk(
+  "shipments/getBatchDetailsForAccountant",
+  async (batchId: string, { rejectWithValue }) => {
+    try {
+      return await shipmentService.getBatchDetailsForAccountant(batchId);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || { message: error.message });
+    }
+  }
+);
+export const approveBatch = createAsyncThunk(
+  "shipments/approveBatch",
+  async (batchId: string, { rejectWithValue }) => {
+    try {
+      return await shipmentService.approveBatch(batchId);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || { message: error.message });
+    }
+  }
+);
+export const rejectBatch = createAsyncThunk(
+  "shipments/rejectBatch",
+  async ({ batchId, reason }: { batchId: string, reason: string }, { rejectWithValue }) => {
+    try {
+      return await shipmentService.rejectBatch(batchId, reason);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || { message: error.message });
+    }
+  }
+);
+export const cancelBatch = createAsyncThunk(
+  "shipments/cancelBatch",
+  async (batchId: string, { rejectWithValue }) => {
+    try {
+      return await shipmentService.cancelBatch(batchId);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || { message: error.message });
+    }
+  }
+);
+export const overrideBatch = createAsyncThunk(
+  "shipments/overrideBatch",
+  async ({ batchId, newStatus, reason }: { batchId: string, newStatus: string, reason: string }, { rejectWithValue }) => {
+    try {
+      return await shipmentService.overrideBatch(batchId, newStatus, reason);
     } catch (error: any) {
       return rejectWithValue(error.response?.data || { message: error.message });
     }

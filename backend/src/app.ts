@@ -2,6 +2,8 @@ import express, { type Application, type Request, type Response } from 'express'
 import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
+import cron from 'node-cron';
+import { ShipmentService } from './services/shipment/shipment.service.js';
 
 import companyRoutes from "./Routes/company.routes.js";
 import userRoutes from "./Routes/user.routes.js";
@@ -34,5 +36,18 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/settlements", settlementRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/chat-rooms", chatRoomRoutes);
+
+// Register stale batch cleanup cron job
+cron.schedule('0 * * * *', async () => {
+  try {
+    const shipmentService = new ShipmentService();
+    const result = await shipmentService.cleanupStaleBatches();
+    if (result.expiredCount > 0) {
+      console.log(`[Cron] Cleaned up ${result.expiredCount} stale CSV batches`);
+    }
+  } catch (error) {
+    console.error("[Cron] Error cleaning up stale batches:", error);
+  }
+});
 
 export default app;

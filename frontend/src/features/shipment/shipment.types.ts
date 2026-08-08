@@ -43,3 +43,19 @@ export interface UpdateShipmentStatusPayload {
   note?: string;
   actorId?: string;
 }
+
+export interface ShipmentBatch {
+  _id: string;
+  batchId: string;
+  count: number;
+  submittedAt: string;
+  submittedBy: string;
+}
+
+export interface BatchDetailsResponse {
+  success: boolean;
+  data: {
+    batchId: string;
+    shipments: any[];
+  };
+}

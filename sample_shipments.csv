@@ -1,2 +1,5 @@
-tracking_number,customer_name,customer_phone,delivery_address,pickup_address,cod_amount,driver_email
-TRK-TEST-001,Ahmed Hassan,01012345678,15 Nile St Giza,Main Warehouse,250,driver2@company.com
+shipment_code,driver_phone,vehicle_plate,origin_hub_code,destination_city,customer_name,customer_phone,customer_email,customer_address,cargo_weight_kg,cod_amount,estimated_delivery,notes
+TRK-1001,+201001234567,ABC-123,HUB-CAI-MC,Cairo,John Doe,201098765432,john@example.com,123 Main St Cairo,5.5,150.00,2026-08-10,Leave at door
+TRK-1002,+201001234567,ABC-123,HUB-CAI-MC,Alexandria,Jane Smith,201123456789,jane@example.com,45 Sea View Road,12.0,300.00,2026-08-11,
+TRK-1003,+201001234567,ABC-123,HUB-CAI-MC,Cairo,Ahmed Ali,201500000000,,78 Downtown Ave,1.2,50.00,,Fragile
+TRK-1004,+201001234567,ABC-123,HUB-CAI-MC,Giza,Mona Zaki,201200000000,mona@example.com,99 Pyramids St,0.5,0.00,2026-08-12,Paid online

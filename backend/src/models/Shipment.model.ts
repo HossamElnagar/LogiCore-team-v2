@@ -27,6 +27,16 @@ export interface IShipment extends Document {
   // Bulk Import
   batchId?: string;
   importedVia?: "MANUAL" | "CSV_BULK";
+  submittedBy?: mongoose.Types.ObjectId;
+  submittedAt?: Date;
+  approvedBy?: mongoose.Types.ObjectId;
+  approvedAt?: Date;
+  rejectionReason?: string;
+  validationErrors?: any[];
+  cargoWeightKg?: number;
+  originHubCode?: string;
+  vehiclePlate?: string;
+  driverPhone?: string;
   // Pointer to the most recent/active Incident (eliminates embedded redundancy)
   activeIncidentId?: mongoose.Types.ObjectId;
   feedback?: {
@@ -134,6 +144,16 @@ const shipmentSchema = new Schema<IShipment>(
       enum: ["MANUAL", "CSV_BULK"],
       default: "MANUAL",
     },
+    submittedBy: { type: Schema.Types.ObjectId, ref: "User" },
+    submittedAt: Date,
+    approvedBy: { type: Schema.Types.ObjectId, ref: "User" },
+    approvedAt: Date,
+    rejectionReason: String,
+    validationErrors: { type: [Schema.Types.Mixed], default: [] },
+    cargoWeightKg: Number,
+    originHubCode: String,
+    vehiclePlate: String,
+    driverPhone: String,
     // Pointer to the currently active Incident
     activeIncidentId: {
       type: Schema.Types.ObjectId,

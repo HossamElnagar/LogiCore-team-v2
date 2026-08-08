@@ -24,18 +24,40 @@ export const shipmentService = {
     return response.data;
   },
 
-  bulkImport: async (payload: { shipments: any[] }) => {
-    const response = await api.post<{
-      success: boolean;
-      message: string;
-      data: {
-        batchId: string;
-        totalRows: number;
-        successCount: number;
-        failedCount: number;
-        failedRows: Array<{ row: number; trackingNumber: string; reason: string }>;
-      };
-    }>("/shipments/bulk-import", payload);
+  importCsv: async (csvData: string) => {
+    const response = await api.post("/shipments/import-csv", { csvData });
     return response.data;
   },
+  submitBatchForApproval: async (batchId: string) => {
+    const response = await api.post("/shipments/submit-import", { batchId });
+    return response.data;
+  },
+  approveBatch: async (batchId: string) => {
+    const response = await api.post("/shipments/approve-import", { batchId });
+    return response.data;
+  },
+  rejectBatch: async (batchId: string, rejectionReason: string) => {
+    const response = await api.post("/shipments/reject-import", { batchId, rejectionReason });
+    return response.data;
+  },
+  cancelBatch: async (batchId: string) => {
+    const response = await api.post("/shipments/cancel-import", { batchId });
+    return response.data;
+  },
+  overrideBatch: async (batchId: string, newStatus: string, reason: string) => {
+    const response = await api.post("/shipments/override-batch", { batchId, newStatus, reason });
+    return response.data;
+  },
+  listPendingBatches: async () => {
+    const response = await api.get<{ success: boolean; data: any[] }>("/shipments/pending-batches");
+    return response.data;
+  },
+  getBatchDetailsForFinance: async (batchId: string) => {
+    const response = await api.get<{ success: boolean; data: any }>(`/shipments/pending-batches/${batchId}/finance`);
+    return response.data;
+  },
+  getBatchDetailsForAccountant: async (batchId: string) => {
+    const response = await api.get<{ success: boolean; data: any }>(`/shipments/pending-batches/${batchId}/accountant`);
+    return response.data;
+  }
 };

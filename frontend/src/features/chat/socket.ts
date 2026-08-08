@@ -16,8 +16,14 @@ let socket: Socket | null = null;
  * Should be called once after successful login.
  */
 export function connectSocket(token: string): Socket {
-  if (socket?.connected) return socket;
-
+  if (socket) {
+    if ((socket.auth as { token: string })?.token === token) {
+      if (!socket.connected) socket.connect();
+      return socket;
+    }
+    socket.disconnect();
+    socket = null;
+  }
   socket = io(SOCKET_URL, {
     auth: { token },
     transports: ["websocket", "polling"],

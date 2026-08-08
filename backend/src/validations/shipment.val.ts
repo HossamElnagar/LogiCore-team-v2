@@ -98,4 +98,34 @@ export const bulkImportSchema = joi.object({
     "array.max": "Bulk import cannot exceed 500 shipments per request.",
     "any.required": "Shipments array is required."
   })
+});
+
+export const importCsvSchema = joi.object({
+  csvData: joi.string().required().messages({
+    "any.required": "CSV data is required.",
+    "string.empty": "CSV data cannot be empty."
+  })
+});
+
+export const submitBatchSchema = joi.object({
+  batchId: joi.string().required()
+});
+
+export const approveBatchSchema = joi.object({
+  batchId: joi.string().required()
+});
+
+export const rejectBatchSchema = joi.object({
+  batchId: joi.string().required(),
+  rejectionReason: joi.string().min(5).max(500).required()
+});
+
+export const cancelBatchSchema = joi.object({
+  batchId: joi.string().required()
+});
+
+export const overrideBatchSchema = joi.object({
+  batchId: joi.string().required(),
+  newStatus: joi.string().valid(ShipmentStatus.APPROVED, ShipmentStatus.REJECTED).required(),
+  reason: joi.string().min(5).max(500).required()
 });

@@ -89,34 +89,32 @@ export function parseShipmentCsv(content: string): ParsedCsvRow[] {
     // If row is entirely empty or shorter than minimum required columns, skip or stage as invalid
     if (cells.every((c) => c === "")) continue;
 
-    const hasAnyHeader = codeIdx !== -1 || custNameIdx !== -1 || driverPhoneIdx !== -1 || weightIdx !== -1;
-    const getVal = (idx: number, fallbackIdx: number): string => {
+    const getVal = (idx: number): string => {
       if (idx !== -1 && idx < cells.length) return cells[idx] || "";
-      if (!hasAnyHeader && fallbackIdx >= 0 && fallbackIdx < cells.length) return cells[fallbackIdx] || "";
       return "";
     };
 
-    const raw_cargo_weight = getVal(weightIdx, 9);
+    const raw_cargo_weight = getVal(weightIdx);
     const parsedWeight = parseFloat(raw_cargo_weight);
-    const raw_cod = getVal(codIdx, -1);
+    const raw_cod = getVal(codIdx);
     const parsedCod = parseFloat(raw_cod);
 
     rows.push({
       rowNumber: i,
-      shipment_code: getVal(codeIdx, 0),
-      driver_phone: getVal(driverPhoneIdx, 1),
-      vehicle_plate: getVal(vehiclePlateIdx, 2),
-      origin_hub_code: getVal(hubIdx, 3),
-      destination_city: getVal(destCityIdx, 4),
-      customer_name: getVal(custNameIdx, 5),
-      customer_phone: getVal(custPhoneIdx, 6),
-      customer_email: getVal(custEmailIdx, 7) || undefined,
-      customer_address: getVal(custAddrIdx, 8),
+      shipment_code: getVal(codeIdx),
+      driver_phone: getVal(driverPhoneIdx),
+      vehicle_plate: getVal(vehiclePlateIdx),
+      origin_hub_code: getVal(hubIdx),
+      destination_city: getVal(destCityIdx),
+      customer_name: getVal(custNameIdx),
+      customer_phone: getVal(custPhoneIdx),
+      customer_email: getVal(custEmailIdx) || undefined,
+      customer_address: getVal(custAddrIdx),
       cargo_weight_kg: isNaN(parsedWeight) ? -1 : parsedWeight,
       raw_cargo_weight,
       cod_amount: isNaN(parsedCod) ? 0 : parsedCod,
-      estimated_delivery: getVal(estDateIdx, 10) || undefined,
-      notes: getVal(notesIdx, 11) || undefined,
+      estimated_delivery: getVal(estDateIdx) || undefined,
+      notes: getVal(notesIdx) || undefined,
       rawLine,
     });
   }

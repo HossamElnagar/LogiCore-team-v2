@@ -55,6 +55,7 @@ export class ChatRoomController {
       const companyId = req.user?.companyId;
 
       if (!id || !companyId || !mongoose.Types.ObjectId.isValid(id as string)) {
+        console.log("getMessages ERROR ->", { id, companyId, isValid: mongoose.Types.ObjectId.isValid(id as string) });
         return res.status(400).json({ success: false, message: "Invalid room ID or company context" });
       }
 
@@ -194,10 +195,15 @@ export class ChatRoomController {
         return res.status(404).json({ success: false, message: "Associated incident not found." });
       }
 
-      // If CS_AGENT, must be assigned to the ticket
+      // If CS_AGENT, must be assigned to the ticket OR ticket must be unassigned
       if (role === UserRole.CS_AGENT) {
-        if (String(incident.assignedTo) !== String(userId)) {
+        if (incident.assignedTo && String(incident.assignedTo) !== String(userId)) {
           return res.status(403).json({ success: false, message: "You can only resolve incidents you are assigned to." });
+        }
+        
+        // Auto-assign if it was unassigned
+        if (!incident.assignedTo) {
+          incident.assignedTo = new mongoose.Types.ObjectId(userId) as any;
         }
       }
 

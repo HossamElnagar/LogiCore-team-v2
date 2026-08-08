@@ -15,6 +15,7 @@ import {
   AlertCircle,
   ExternalLink,
 } from "lucide-react";
+import { FinanceBatchReviewSection } from "./FinanceBatchReviewSection";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -398,6 +399,8 @@ export const FinanceManagerWorkspace: React.FC = () => {
         isOpen={passwordModalOpen}
         onClose={() => setPasswordModalOpen(false)}
       />
+      
+      <FinanceBatchReviewSection />
     </div>
   );
 };

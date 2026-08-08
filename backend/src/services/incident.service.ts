@@ -220,36 +220,26 @@ export class IncidentService {
       );
     }
 
-    // ── 6. Haversine geo-fence validation ───────────────────────────────
-    if (
-      shipment.deliveryLat == null ||
-      shipment.deliveryLng == null
-    ) {
-      throw new IncidentError(
-        IncidentErrorCode.MISSING_COORDINATES,
-        "Shipment does not have delivery coordinates set. Cannot perform geo-fence validation.",
-        422
+    if (shipment.deliveryLat != null && shipment.deliveryLng != null) {
+      const geoResult = validateGeoFence(
+        { lat: driverLat, lng: driverLng },
+        { lat: shipment.deliveryLat, lng: shipment.deliveryLng },
+        GEO_FENCE_RADIUS_METRES
       );
-    }
 
-    const geoResult = validateGeoFence(
-      { lat: driverLat, lng: driverLng },
-      { lat: shipment.deliveryLat, lng: shipment.deliveryLng },
-      GEO_FENCE_RADIUS_METRES
-    );
-
-    if (!geoResult.withinFence) {
-      throw new IncidentError(
-        IncidentErrorCode.GEO_FENCE_VIOLATION,
-        `Geo-fence violation: You are ${geoResult.distanceMetres}m from the delivery location. Maximum allowed radius is ${geoResult.maxRadiusMetres}m. You must be within ${GEO_FENCE_RADIUS_METRES} metres of the client location to report an incident.`,
-        400,
-        {
-          driverCoordinates: { lat: driverLat, lng: driverLng },
-          deliveryCoordinates: { lat: shipment.deliveryLat, lng: shipment.deliveryLng },
-          distanceMetres: geoResult.distanceMetres,
-          maxRadiusMetres: geoResult.maxRadiusMetres,
-        }
-      );
+      if (!geoResult.withinFence) {
+        throw new IncidentError(
+          IncidentErrorCode.GEO_FENCE_VIOLATION,
+          `Geo-fence violation: You are ${geoResult.distanceMetres}m from the delivery location. Maximum allowed radius is ${geoResult.maxRadiusMetres}m. You must be within ${GEO_FENCE_RADIUS_METRES} metres of the client location to report an incident.`,
+          400,
+          {
+            driverCoordinates: { lat: driverLat, lng: driverLng },
+            deliveryCoordinates: { lat: shipment.deliveryLat, lng: shipment.deliveryLng },
+            distanceMetres: geoResult.distanceMetres,
+            maxRadiusMetres: geoResult.maxRadiusMetres,
+          }
+        );
+      }
     }
 
     // ── 7. Execute atomic state mutations ───────────────────────────────

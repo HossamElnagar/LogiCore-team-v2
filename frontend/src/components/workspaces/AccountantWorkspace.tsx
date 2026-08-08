@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import api from "../../api/axios";
 import type { AppDispatch, RootState } from "../../app/store";
 import { useLanguage } from "../../context/LanguageContext";
-import { importShipments } from "../../features/shipment/shipmentSlice";
+import { stageCsvImport, getBatchDetailsForAccountant } from "../../features/shipment/shipmentSlice";
+import { CsvValidationPreviewTable } from "./CsvValidationPreviewTable";
 
 interface DriverRow {
   _id: string;
@@ -67,7 +68,11 @@ export function AccountantWorkspace() {
   const { t, dir } = useLanguage();
   const [drivers, setDrivers] = useState<DriverRow[]>([]);
   const [summary, setSummary] = useState<SummaryRow>({ totalExpected: 0, totalCollected: 0, discrepancy: 0, reconciledDriversCount: 0 });
-  const [stagedRows, setStagedRows] = useState<any[]>([]);
+  
+  const [rawCsvText, setRawCsvText] = useState<string>("");
+  const [activeBatchId, setActiveBatchId] = useState<string | null>(null);
+  const [stagedShipments, setStagedShipments] = useState<any[]>([]);
+
   const [status, setStatus] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -97,20 +102,15 @@ export function AccountantWorkspace() {
     if ('dataTransfer' in event) {
       file = event.dataTransfer.files?.[0];
     } else {
-      file = event.target.files?.[0];
+      file = (event.target as HTMLInputElement).files?.[0];
     }
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;
-      const parsed = parseCsv(text);
-      if (parsed.length === 0) {
-        setStatus("CSV is empty or invalid format.");
-      } else {
-        setStagedRows(parsed);
-        setStatus(`Staged ${parsed.length} rows from CSV.`);
-      }
+      setRawCsvText(text);
+      setStatus("CSV file selected. Ready to stage.");
     };
     reader.onerror = () => {
       setStatus("Failed to read CSV file");
@@ -135,47 +135,34 @@ export function AccountantWorkspace() {
   };
 
   const uploadToServer = async () => {
-    if (stagedRows.length === 0) return;
+    if (!rawCsvText) return;
     setIsUploading(true);
-    setStatus("Uploading to server...");
+    setStatus("Staging CSV import...");
     
     try {
-      const resultAction = await dispatch(importShipments({ shipments: stagedRows }));
+      const resultAction = await dispatch(stageCsvImport(rawCsvText));
       
-      if (importShipments.fulfilled.match(resultAction)) {
+      if (stageCsvImport.fulfilled.match(resultAction)) {
         const payload = resultAction.payload as any;
-        if (payload.success) {
-           setStatus(payload.message);
-           setStagedRows([]); // Clear staged rows on success
-           if (fileInputRef.current) fileInputRef.current.value = '';
-           void loadData();
+        if (payload.success && payload.data.batchId) {
+           setStatus("CSV staged successfully. Loading preview...");
+           const detailsRes = await dispatch(getBatchDetailsForAccountant(payload.data.batchId));
+           if (getBatchDetailsForAccountant.fulfilled.match(detailsRes)) {
+             const detailsPayload = detailsRes.payload as any;
+             setActiveBatchId(detailsPayload.data.batchId);
+             setStagedShipments(detailsPayload.data.shipments);
+             setStatus("");
+           } else {
+             setStatus("Failed to load batch details.");
+           }
         } else {
            setStatus(`Error: ${payload.message}`);
         }
       } else {
-         const errorPayload = resultAction.payload as any;
-         let errorMessage = "Unknown error occurred";
-         
-         if (typeof errorPayload === "string") {
-            // Strip HTML tags if the server returned an HTML error page
-            errorMessage = errorPayload.replace(/<[^>]*>?/gm, '').substring(0, 200);
-         } else if (errorPayload?.errors && Array.isArray(errorPayload.errors)) {
-            // Handle Joi Validation Errors
-            errorMessage = errorPayload.errors.map((e: any) => `${e.field}: ${e.message}`).join(" | ");
-         } else if (errorPayload?.message) {
-            errorMessage = errorPayload.message;
-            if (errorPayload?.data?.failedRows?.length > 0) {
-               const reasons = errorPayload.data.failedRows.map((r: any) => `Row ${r.row}: ${r.reason}`).join(", ");
-               errorMessage += ` | Details: ${reasons}`;
-            }
-         } else {
-            errorMessage = resultAction.error.message || "Upload rejected";
-         }
-         
-         setStatus(`Error: ${errorMessage}`);
+         setStatus("Upload rejected");
       }
     } catch (err: any) {
-      setStatus(err?.response?.data?.message || err?.message || "An error occurred during upload");
+      setStatus(err?.response?.data?.message || err?.message || "An error occurred during staging");
     } finally {
       setIsUploading(false);
     }
@@ -285,58 +272,33 @@ export function AccountantWorkspace() {
             </label>
           </div>
 
-          {stagedRows.length > 0 && (
-            <button 
-              type="button" 
-              onClick={uploadToServer} 
-              disabled={isUploading}
-              className="mt-4 w-full rounded-xl bg-amber-500 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-amber-400 disabled:opacity-50 transition"
+          {rawCsvText && (
+            <button
+              onClick={uploadToServer}
+              disabled={!rawCsvText || isUploading}
+              className="mt-4 w-full rounded-xl bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 disabled:opacity-50 transition"
             >
-              {isUploading ? "Uploading..." : "Upload to Server"}
+              {isUploading ? "Staging..." : "Stage CSV"}
             </button>
           )}
 
-          <div className="mt-5 overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
-              <thead className="border-b border-slate-200 text-xs uppercase tracking-[0.25em] text-slate-500">
-                <tr>
-                  <th className="pb-3">Tracking</th>
-                  <th className="pb-3">Amount</th>
-                  <th className="pb-3">Warehouse</th>
-                  <th className="pb-3">Driver</th>
-                  <th className="pb-3 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700">
-                {stagedRows.slice(0, 10).map((row, index) => (
-                  <tr key={`${row.trackingNumber}-${index}`}>
-                    <td className="py-2">{row.trackingNumber}</td>
-                    <td className="py-2">{row.codAmount}</td>
-                    <td className="py-2">{row.pickupAddress}</td>
-                    <td className="py-2">{row.driverEmail}</td>
-                    <td className="py-2 text-right">
-                      <button 
-                        type="button" 
-                        onClick={() => deleteStagedRow(index)}
-                        className="rounded bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 px-2 py-1 text-xs font-semibold transition"
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {stagedRows.length > 10 && (
-                  <tr>
-                    <td colSpan={5} className="py-3 text-center text-xs text-slate-500 italic">
-                      ...and {stagedRows.length - 10} more rows
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
         </section>
       </div>
+
+      {/* CSV Preview Table */}
+      {activeBatchId ? (
+        <CsvValidationPreviewTable 
+          batchId={activeBatchId} 
+          shipments={stagedShipments} 
+          onClear={() => { setActiveBatchId(null); setStagedShipments([]); setRawCsvText(""); }} 
+        />
+      ) : (
+        rawCsvText && !isUploading && (
+          <div className="mt-6 p-4 bg-emerald-50 text-emerald-800 rounded-lg">
+            CSV File loaded in memory. Click "Stage CSV" to validate on the server.
+          </div>
+        )
+      )}
     </div>
   );
 }
