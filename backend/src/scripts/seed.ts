@@ -1,3 +1,4 @@
+
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
@@ -632,3 +633,4 @@ async function main() {
 }
 
 main();
+
