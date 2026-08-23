@@ -109,7 +109,7 @@ export class IncidentController {
    * Lists all incidents scoped to the authenticated user's company.
    * Sorted by creation date (newest first).
    */
-  async list(req: AuthRequest, res: Response) {
+  /*async list(req: AuthRequest, res: Response) {
     try {
       const incidents = await incidentService.listIncidents(
         req.user?.companyId,
@@ -121,7 +121,30 @@ export class IncidentController {
       return IncidentController._handleError(res, error);
     }
   }
+*/
+async list(req: AuthRequest, res: Response) {
+  try {
+    // استقبال رقم الصفحة وحجمها من الـ Query String
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 10;
 
+    const result = await incidentService.listIncidents(
+      req.user?.companyId,
+      req.user?.sub,
+      req.user?.role,
+      page,
+      limit
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: result.incidents,
+      pagination: result.pagination,
+    });
+  } catch (error: any) {
+    return IncidentController._handleError(res, error);
+  }
+}
   /**
    * GET /api/incidents/:id
    * ──────────────────────────────────────────────────────────────────────

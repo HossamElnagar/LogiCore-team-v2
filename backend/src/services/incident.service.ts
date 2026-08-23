@@ -464,7 +464,7 @@ export class IncidentService {
   // ══════════════════════════════════════════════════════════════════════════
 
   /** List all incidents scoped to the requesting user's company */
-  async listIncidents(companyId?: string, userId?: string, role?: string) {
+  /*async listIncidents(companyId?: string, userId?: string, role?: string) {
     if (!companyId) {
       throw new IncidentError(
         IncidentErrorCode.AUTH_REQUIRED,
@@ -485,7 +485,53 @@ export class IncidentService {
       .populate("reportedBy", "userName email role")
       .lean();
   }
+*/
 
+async listIncidents(
+  companyId?: string,
+  userId?: string,
+  role?: string,
+  page: number = 1,
+  limit: number = 10
+) {
+  if (!companyId) {
+    throw new IncidentError(
+      IncidentErrorCode.AUTH_REQUIRED,
+      "Authentication context is required.",
+      401
+    );
+  }
+
+  const query: any = { companyId };
+
+  // Drivers only see their own incidents
+  if (role === "DRIVER" && userId) {
+    query.reportedBy = new mongoose.Types.ObjectId(userId);
+  }
+
+  const skip = (page - 1) * limit;
+
+  // جلب البيانات والحساب في نفس الوقت لتحسين الأداء
+  const [incidents, totalItems] = await Promise.all([
+    Incident.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("reportedBy", "userName email role")
+      .lean(),
+    Incident.countDocuments(query),
+  ]);
+
+  return {
+    incidents,
+    pagination: {
+      totalItems,
+      currentPage: page,
+      totalPages: Math.ceil(totalItems / limit) || 1,
+      itemsPerPage: limit,
+    },
+  };
+}
   /** Get a single incident by ID, scoped to the requesting user's company */
   async getIncidentById(id: string, companyId?: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) {

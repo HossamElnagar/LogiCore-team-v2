@@ -49,14 +49,32 @@ export class ChatRoomController {
         query.participants = req.user.sub;
       }
 
+      const limit = Math.min(parseInt(req.query.limit as string) || 2, 100);
+      const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+      const skip = (page - 1) * limit;
+
       const rooms = await ChatRoom.find(query)
         .populate("participants", "userName role email")
         .populate("createdById", "userName role email")
-        .populate({ path: "incidentId", select: "title severity status description reportedBy", populate: { path: "reportedBy", select: "userName" } })
+        .populate({
+          path: "incidentId",
+          select: "title severity status description reportedBy",
+          populate: { path: "reportedBy", select: "userName" }
+        })
         .sort({ updatedAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .lean();
 
-      return res.status(200).json({ success: true, data: rooms });
+      return res.status(200).json({
+        success: true,
+        data: rooms,
+        meta: {
+          page,
+          limit,
+          hasMore: rooms.length === limit
+        }
+      });
     } catch (error: any) {
       return res.status(500).json({ success: false, message: error.message });
     }
@@ -215,7 +233,7 @@ export class ChatRoomController {
       }
 
       const incident = await Incident.findOne({ _id: room.incidentId, companyId: new mongoose.Types.ObjectId(companyId!) });
-      
+
       if (!incident) {
         return res.status(404).json({ success: false, message: "Associated incident not found." });
       }
