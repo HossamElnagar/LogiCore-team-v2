@@ -1,0 +1,15 @@
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/logicore
+
+# App environment
+NODE_ENV=development
+
+# JWT for signing auth tokens — change to a strong random value in production
+JWT_SECRET=change_this_to_a_secure_random_string
+
+# Frontend origin used for tracking links and socket CORS
+CLIENT_ORIGIN=http://localhost:5173
+
+# SMTP credentials for sending emails (leave SMTP_PASS empty for Ethereal/dev)
+SMTP_USER=dev-reconciliation@logicore.com
+SMTP_PASS=

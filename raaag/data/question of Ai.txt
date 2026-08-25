@@ -1,0 +1,164 @@
+
+Q:
+
+When should a damaged shipment be escalated?
+
+Expected Answer:
+
+If the damage exceeds $500, the case must be escalated to the regional manager for approval.
+
+Q:
+
+How quickly should the customer be informed about a damaged shipment?
+
+Expected Answer:
+
+The customer must be informed within 30 minutes.
+
+🟡 2. Delivery Dispute
+
+Q:
+
+What should I do if a customer says they didn't receive their shipment?
+
+Expected Answer:
+
+Verify the delivery signature or photo proof. If the proof is missing or unclear, initiate a trace with the driver. If the customer is still not satisfied, offer a partial refund or re-delivery.
+
+Q:
+
+What happens if delivery proof is missing?
+
+Expected Answer:
+
+Initiate a trace with the driver.
+
+Q:
+
+How long do we have to resolve a delivery dispute?
+
+Expected Answer:
+
+All delivery disputes must be resolved within 48 hours.
+
+🔵 3. Vehicle Breakdown
+
+Q:
+
+What should a driver do if the delivery vehicle breaks down?
+
+Expected Answer:
+
+The driver should park safely, turn on the hazard lights, and contact the dispatch center. Dispatch will arrange a replacement vehicle or tow truck. The driver must stay with the vehicle and ensure the cargo is secure.
+
+Q:
+
+Who arranges a replacement vehicle after a breakdown?
+
+Expected Answer:
+
+The dispatch center arranges a replacement vehicle or tow truck.
+
+Q:
+
+How long is the estimated resolution time for a vehicle breakdown?
+
+Expected Answer:
+
+The estimated resolution time is 2–4 hours.
+
+🟠 4. Delayed Shipment
+
+Q:
+
+What happens when a shipment is delayed?
+
+Expected Answer:
+
+The system automatically sends an SMS and email to the customer every 2 hours until delivery.
+
+Q:
+
+When should customer service call a customer about a delay?
+
+Expected Answer:
+
+The customer service team should proactively call the customer if the delay exceeds 4 hours.
+
+Q:
+
+What compensation should we offer for a delayed shipment?
+
+Expected Answer:
+
+Offer a discount voucher for the customer's next shipment.
+
+🟣 5. Return Policy
+
+Q:
+
+What happens when a customer returns an item?
+
+Expected Answer:
+
+The item is inspected for quality and restocked if it is in sellable condition. Defective items are sent to the claims department.
+
+Q:
+
+How long does a customer have to wait for a refund?
+
+Expected Answer:
+
+The customer is refunded within 3 business days.
+
+Q:
+
+What reason codes can be used for returns?
+
+Expected Answer:
+
+Returns can be logged with reasons such as damaged, wrong item, or customer changed mind.
+
+🔥 والأهم: Tests تكشف جودة الـ RAG
+
+جربي دول كمان:
+
+Test 1 — صياغة مختلفة
+
+A parcel arrived broken. What actions should I take?
+
+المفروض يجيب DAMAGED SHIPMENT POLICY.
+
+Test 2 — سؤال غير مباشر
+
+The customer says their package never arrived. What should I verify first?
+
+المفروض يجيب DELIVERY DISPUTE POLICY ويقول:
+
+Verify the delivery signature or photo proof.
+
+Test 3 — سؤال عن رقم
+
+How many hours before customer service should proactively call about a delay?
+
+المفروض:
+
+4 hours.
+
+Test 4 — سؤال عن مبلغ
+
+At what damage amount do we need regional manager approval?
+
+المفروض:
+
+More than $500.
+
+Test 5 — سؤال مش موجود
+
+What should I do if the customer gives me the wrong address?
+
+ده مهم جدًا.
+
+المفروض ما يخترعش Policy، ويقول حاجة بمعنى:
+
+I could not find a relevant policy in the local knowledge base.

@@ -1,0 +1,4 @@
+shipment_code,customer_name,destination_city,driver_phone,vehicle_plate,origin_hub_code,cargo_weight_kg,cod_amount,customer_phone,delivery_address
+SHIP-QA-001,Al-Ahram Trading,Cairo,01098765432,MC-V889,HUB-CAI-MC,150.5,4500,01112223333,22 Tahrir Square Cairo
+SHIP-QA-002,Nile Retailers,Giza,01098765432,MC-V889,HUB-CAI-MC,80.0,1200,01223334444,15 Mohandessin Ave
+SHIP-QA-ERR,Faulty Enterprise,Alexandria,99999999999,INVALID-PLATE,NO-HUB,-25.0,-500,123,Invalid Street 99

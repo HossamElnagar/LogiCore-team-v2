@@ -1,0 +1,53 @@
+DAMAGED SHIPMENT POLICY
+
+Upon receiving a damaged shipment report, the customer service agent must log the incident with severity HIGH.
+
+Immediately contact the driver to verify the damage and request photographic evidence.
+
+The claims department must be notified.
+
+The customer must be informed within 30 minutes.
+
+If the damage exceeds $500, escalate the case to the regional manager for approval.
+
+
+DELIVERY DISPUTE POLICY
+
+When a customer disputes a delivery, such as non-receipt, the agent should verify the delivery signature or photo proof.
+
+If proof is missing or unclear, initiate a trace with the driver.
+
+If the customer is not satisfied, offer a partial refund or re-delivery.
+
+All disputes must be resolved within 48 hours.
+
+
+VEHICLE BREAKDOWN POLICY
+
+If a delivery vehicle breaks down, the driver must immediately park safely, turn on hazard lights, and contact the dispatch center.
+
+Dispatch will arrange a replacement vehicle or tow truck.
+
+The driver must stay with the vehicle and ensure the cargo is secure.
+
+Estimated resolution time is 2-4 hours.
+
+
+DELAYED SHIPMENT POLICY
+
+For shipments delayed beyond the estimated delivery time, the system automatically sends an SMS and email to the customer every 2 hours until delivery.
+
+The customer service team must proactively call the customer if the delay exceeds 4 hours.
+
+Offer a discount voucher for the next shipment as compensation.
+
+
+RETURN POLICY
+
+Returned items are inspected for quality and restocked if in sellable condition.
+
+Items with defects are sent to the claims department.
+
+The customer is refunded within 3 business days.
+
+All returns must be logged with a reason code such as damaged, wrong item, or customer changed mind.
